@@ -37,10 +37,12 @@ class LoginController extends Controller
      */
     protected function authenticated($request, $user)
     {
-        if ($user->isAdmin()) {
-            return redirect('/home'); // Redirect to admin dashboard
-        }
+        $token = $user->createToken('API Token')->plainTextToken;
+        $redirectUrl = $user->isAdmin() ? '/home' : '/profile';
 
-        return redirect('/profile'); // Redirect to user profile page
+        return response()->make("<script>
+        localStorage.setItem('token', '{$token}');
+        window.location.href = '{$redirectUrl}';
+    </script>", 200, ['Content-Type' => 'text/html']);
     }
 }
